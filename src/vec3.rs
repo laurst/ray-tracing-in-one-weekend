@@ -1,5 +1,8 @@
 use std::ops;
 
+pub type Color = Vec3;
+pub type Point3 = Vec3;
+
 #[derive(Debug)]
 pub struct Vec3 {
     pub x: f64,
@@ -7,7 +10,6 @@ pub struct Vec3 {
     pub z: f64,
 }
 
-// TODO : should probably use default trait impl in order to define both color and point
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3{x, y, z}
@@ -42,6 +44,14 @@ impl Vec3 {
         }
     }
 
+    pub fn constant_mul(&self, t: f64) -> Self {
+        Vec3{
+            x: self.x * t,
+            y: self.y * t,
+            z: self.z * t,
+        }
+    }
+
 }
 
 impl ops::Add for Vec3 {
@@ -66,7 +76,6 @@ impl ops::Sub for Vec3 {
     }
 }
 
-// TODO missing constant mul
 impl ops::Mul for Vec3 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {

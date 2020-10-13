@@ -1,4 +1,5 @@
 mod vec3;
+mod ray;
 
 const WIDTH: i32 = 256;
 const HEIGHT: i32 = 256;
@@ -9,7 +10,7 @@ fn main() {
     for j in (0..HEIGHT).rev() {
         eprint!("\rlines remaining : {}", j);
         for i in 0..WIDTH {
-            let color = vec3::Vec3{
+            let color = vec3::Color{
                 x: i as f64 / (WIDTH-1) as f64,
                 y: j as f64 / (HEIGHT-1) as f64,
                 z: 0.25,
