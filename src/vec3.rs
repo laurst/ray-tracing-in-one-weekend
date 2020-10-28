@@ -3,7 +3,7 @@ use std::ops;
 pub type Color = Vec3;
 pub type Point3 = Vec3;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -44,11 +44,19 @@ impl Vec3 {
         }
     }
 
-    pub fn constant_mul(&self, t: f64) -> Self {
+    pub fn mul(&self, t: f64) -> Self {
         Vec3{
             x: self.x * t,
             y: self.y * t,
             z: self.z * t,
+        }
+    }
+
+    pub fn div(&self, t: f64) -> Self {
+        Vec3{
+            x: self.x / t,
+            y: self.y / t,
+            z: self.z / t,
         }
     }
 
