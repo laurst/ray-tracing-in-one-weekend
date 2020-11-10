@@ -19,25 +19,25 @@ impl Hittable for Sphere {
         let c = oc.length_squared() - self.radius.powi(2);
         let discriminant = half_b.powi(2) - a*c;
 
-        if discriminant > 0. {
-            let root = discriminant.sqrt();
+        if discriminant < 0. {
+            return False;
+        }
 
-            let mut temp = (-half_b - root) / a);
-            if temp < t_max && temp > t_min {
-                rec.t = temp;
-                rec.p = r.at(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
-                return true;
-            }
+        let sqrtd = discriminant.sqrt();
 
-            temp = (-half_b + root) / a;
-            if temp < t_max && temp > t_min {
-                rec.t = temp;
-                rec.p = r.at(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
-                return true;
+        let mut root = (-half_b - sqrtd) / a;
+
+        if root < t_min || t_max < root {
+            root = (-half_b + sqrtd) / a;
+            if root < t_min || t_max < root {
+                return False;
             }
         }
-        return false;
+
+        rec.t = root;
+        rec.p = r.at(rec.t);
+        rec.normal = (rec.p - center) / radius;
+
+        return true;
     }
 }
