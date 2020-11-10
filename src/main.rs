@@ -2,12 +2,15 @@ mod vec3;
 mod ray;
 
 use std::io::{stderr, Write};
+
+use ray::Ray;
 use vec3::{Point3, Vec3, Color};
 
-fn ray_color(ray: &ray::Ray) -> Color {
+fn ray_color(ray: &Ray) -> Color {
     let camera = Point3::new(0., 0., -1.);
-    if hit_sphere(&camera, 0.5, ray) {
-        return Color::new(1., 0., 0.);
+    if let Some(t) = hit_sphere(&camera, 0.5, ray) {
+        let n = (ray.at(t) - Vec3::new(0., 0., -1.)).unit_vector();
+        return Color::new(n.x+1., n.y+1., n.z+1.).mul(0.5);
     }
 
     let unit_direction = ray.dir.unit_vector();
@@ -17,14 +20,18 @@ fn ray_color(ray: &ray::Ray) -> Color {
            + Color::new(0.5, 0.7, 1.0).mul(t);
 }
 
-fn hit_sphere(center: &Point3, radius: f64, r: &ray::Ray) -> bool {
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> Option<f64> {
     let oc = r.orig - *center;
-    let a = r.dir.dot(&r.dir);
-    let b = 2.0 * oc.dot(&r.dir);
-    let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let a = r.dir.length_squared();
+    let half_b = oc.dot(&r.dir);
+    let c = oc.length_squared() - radius.powi(2);
+    let discriminant = half_b.powi(2) - a*c;
 
-    discriminant > 0.
+    if discriminant < 0. {
+        return None;
+    } else {
+        return Some((-half_b - discriminant.sqrt()) / a);
+    }
 }
 
 fn main() {
@@ -52,7 +59,7 @@ fn main() {
         for i in 0..image_width {
             let u = i as f64 / (image_width - 1) as f64;
             let v = j as f64 / (image_height - 1) as f64;
-            let r = ray::Ray{
+            let r = Ray{
                 orig: origin,
                 dir: lower_left_corner + horizontal.mul(u) + vertical.mul(v) - origin,
             };
