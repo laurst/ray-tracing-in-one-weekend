@@ -1,21 +1,17 @@
+mod hittable;
 mod ray;
 mod vec3;
 
+use hittable::{HitRecord, Hittable};
 use ray::Ray;
 use vec3::{Point3, Vec3};
-
-pub struct HitRecord {
-    pub p: Point3,
-    pub normal: Vec3,
-    pub t: f64,
-}
 
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
 }
 
-impl Sphere {
+impl Hittable for Sphere {
     pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let oc = r.orig - self.center;
         let a = r.dir.length_squared();
