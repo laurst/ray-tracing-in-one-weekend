@@ -43,23 +43,6 @@ impl Vec3 {
             z: self.z / len,
         }
     }
-
-    pub fn mul(&self, t: f64) -> Self {
-        Vec3{
-            x: self.x * t,
-            y: self.y * t,
-            z: self.z * t,
-        }
-    }
-
-    pub fn div(&self, t: f64) -> Self {
-        Vec3{
-            x: self.x / t,
-            y: self.y / t,
-            z: self.z / t,
-        }
-    }
-
 }
 
 impl ops::Add for Vec3 {
@@ -84,6 +67,17 @@ impl ops::Sub for Vec3 {
     }
 }
 
+impl ops::Mul<f64> for Vec3 {
+    type Output = Self;
+    fn mul(self, t: f64) -> Self {
+        Vec3{
+            x: self.x * t,
+            y: self.y * t,
+            z: self.z * t,
+        }
+    }
+}
+
 impl ops::Mul for Vec3 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {
@@ -91,6 +85,17 @@ impl ops::Mul for Vec3 {
             x: self.x * other.x,
             y: self.y * other.y,
             z: self.z * other.z,
+        }
+    }
+}
+
+impl ops::Div<f64> for Vec3 {
+    type Output = Self;
+    fn div(self, t: f64) -> Self {
+        Vec3{
+            x: self.x / t,
+            y: self.y / t,
+            z: self.z / t,
         }
     }
 }
