@@ -1,44 +1,47 @@
-mod vec3;
+mod hittable;
+mod hittable_list;
 mod ray;
+mod sphere;
+mod vec3;
 
 use std::io::{stderr, Write};
 
+use hittable::Hittable;
+use hittable_list::hittable_list_hit;
 use ray::Ray;
+use sphere::Sphere;
 use vec3::{Point3, Vec3, Color};
 
-fn ray_color(ray: &Ray) -> Color {
-    let camera = Point3::new(0., 0., -1.);
-    if let Some(t) = hit_sphere(&camera, 0.5, ray) {
-        let n = (ray.at(t) - Vec3::new(0., 0., -1.)).unit_vector();
-        return Color::new(n.x+1., n.y+1., n.z+1.) * 0.5;
+fn ray_color<T: Hittable>(r: &Ray, world: &Vec<T>) -> Color {
+    if let Some(rec) = hittable_list_hit(world, r, 0., f64::INFINITY) {
+        return (rec.normal + Color::new(1., 1., 1.)) * 0.5;
     }
 
-    let unit_direction = ray.dir.unit_vector();
+    let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
 
     return Color::new(1.0, 1.0, 1.0) * (1.0 - t)
            + Color::new(0.5, 0.7, 1.0) * t;
 }
 
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> Option<f64> {
-    let oc = r.orig - *center;
-    let a = r.dir.length_squared();
-    let half_b = oc.dot(&r.dir);
-    let c = oc.length_squared() - radius.powi(2);
-    let discriminant = half_b.powi(2) - a*c;
-
-    if discriminant < 0. {
-        return None;
-    } else {
-        return Some((-half_b - discriminant.sqrt()) / a);
-    }
-}
-
 fn main() {
+    // IMAGE
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
 
+    // WORLD
+    let mut world: Vec<Sphere> = vec!();
+    world.push(Sphere{
+        center:Point3::new(0., 0., -1.),
+        radius: 0.5,
+    });
+    world.push(Sphere{
+        center:Point3::new(0., -100.5, -1.),
+        radius: 100.,
+    });
+
+    // CAMERA
     let viewport_height = 2.0;
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
@@ -55,15 +58,15 @@ fn main() {
 
     for j in (0..image_height).rev() {
         eprint!("\rlines remaining : {:>3}", j);
-        stderr().flush();
+        let _ = stderr().flush();
         for i in 0..image_width {
             let u = i as f64 / (image_width - 1) as f64;
             let v = j as f64 / (image_height - 1) as f64;
             let r = Ray{
                 orig: origin,
-                dir: lower_left_corner + horizontal * u + vertical * v - origin,
+                dir: lower_left_corner + horizontal * u + vertical * v,
             };
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             vec3::write_color(&pixel_color);
         }
     }
