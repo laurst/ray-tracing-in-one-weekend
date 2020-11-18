@@ -55,7 +55,7 @@ fn main() {
         eprint!("\rlines remaining : {:>3}", j);
         let _ = stderr().flush();
         for i in 0..image_width {
-            let mut pixel_color = Color::new(0., 0., 0.);
+            let mut pixel_color = Color::zero();
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + rand::random::<f64>()) / (image_width - 1) as f64;
                 let v = (j as f64 + rand::random::<f64>()) / (image_height - 1) as f64;

@@ -11,8 +11,8 @@ pub struct HitRecord {
 impl HitRecord {
     pub fn new() -> HitRecord {
         HitRecord{
-            p: Point3::new(0., 0., 0.),
-            normal: Vec3::new(0., 0., 0.),
+            p: Point3::zero(),
+            normal: Vec3::zero(),
             t: 0.,
             front_face: true,
         }
