@@ -152,10 +152,23 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-pub fn write_color(v: &Vec3) {
-    println!("{} {} {}",
-             (255.999 * v.x) as u32,
-             (255.999 * v.y) as u32,
-             (255.999 * v.z) as u32
-    );
+pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
+    let mut r = pixel_color.x;
+    let mut g = pixel_color.y;
+    let mut b = pixel_color.z;
+
+    let scale = 1.0 / samples_per_pixel as f64;
+    r *= scale;
+    g *= scale;
+    b *= scale;
+
+    format!("{} {} {}",
+           (256. * clamp(r, 0., 0.999)) as u32,
+           (256. * clamp(g, 0., 0.999)) as u32,
+           (256. * clamp(b, 0., 0.999)) as u32
+    )
+}
+
+fn clamp(x: f64, min: f64, max: f64) -> f64 {
+    if x < min { min } else if x > max { max } else { x }
 }

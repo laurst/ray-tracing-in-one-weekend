@@ -3,3 +3,5 @@
 /books
 
 *.ppm
+
+Cargo.lock
