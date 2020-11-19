@@ -18,13 +18,13 @@ use vec3::{Point3, Color};
 
 fn ray_color<T: Hittable>(r: &Ray, world: &Vec<T>) -> Color {
     if let Some(rec) = hittable_list_hit(world, r, 0., f64::INFINITY) {
-        return (rec.normal + Color::new(1., 1., 1.)) * 0.5;
+        return (rec.normal + Color::new(1, 1, 1)) * 0.5;
     }
 
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
 
-    return Color::new(1.0, 1.0, 1.0) * (1.0 - t)
+    return Color::new(1, 1, 1) * (1.0 - t)
            + Color::new(0.5, 0.7, 1.0) * t;
 }
 
@@ -38,11 +38,11 @@ fn main() {
     // WORLD
     let mut world: Vec<Sphere> = vec!();
     world.push(Sphere{
-        center:Point3::new(0., 0., -1.),
+        center: Point3::new(0, 0, -1),
         radius: 0.5,
     });
     world.push(Sphere{
-        center:Point3::new(0., -100.5, -1.),
+        center: Point3::new(0., -100.5, -1.),
         radius: 100.,
     });
 
