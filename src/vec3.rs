@@ -1,5 +1,7 @@
 use std::ops;
 
+use rand::{random, thread_rng, Rng};
+
 pub type Color = Vec3;
 pub type Point3 = Vec3;
 
@@ -47,6 +49,23 @@ impl Vec3 {
             x: self.x / len,
             y: self.y / len,
             z: self.z / len,
+        }
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3{
+            x: random::<f64>(),
+            y: random::<f64>(),
+            z: random::<f64>(),
+        }
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        let mut rng = thread_rng();
+        Vec3{
+            x: rng.gen_range(min, max),
+            y: rng.gen_range(min, max),
+            z: rng.gen_range(min, max),
         }
     }
 }
@@ -164,9 +183,9 @@ pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
     let mut b = pixel_color.z;
 
     let scale = 1.0 / samples_per_pixel as f64;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = (scale * r).sqrt();
+    g = (scale * g).sqrt();
+    b = (scale * b).sqrt();
 
     format!("{} {} {}",
            (256. * clamp(r, 0., 0.999)) as u32,
@@ -177,4 +196,25 @@ pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
 
 fn clamp(x: f64, min: f64, max: f64) -> f64 {
     if x < min { min } else if x > max { max } else { x }
+}
+
+pub fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = Vec3::random_range(-1., 1.);
+        if p.length_squared() >= 1. { continue };
+        return p;
+    }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    return random_in_unit_sphere().unit_vector();
+}
+
+pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+    let in_unit_sphere = random_in_unit_sphere();
+    if in_unit_sphere.dot(normal) > 0. {
+        return in_unit_sphere;
+    } else {
+        return -in_unit_sphere;
+    }
 }
