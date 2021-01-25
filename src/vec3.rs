@@ -23,19 +23,19 @@ impl Vec3 {
         Vec3{ x: x.into(), y: y.into(), z: z.into() }
     }
 
-    pub fn length_squared(&self) -> f64 {
+    pub fn length_squared(self) -> f64 {
         self.x.powi(2) + self.y.powi(2) + self.z.powi(2)
     }
 
-    pub fn length(&self) -> f64 {
+    pub fn length(self) -> f64 {
         self.length_squared().sqrt()
     }
 
-    pub fn dot(&self, other: &Self) -> f64 {
+    pub fn dot(self, other: Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn cross(&self, other: &Self) -> Self {
+    pub fn cross(self, other: Self) -> Self {
         Vec3{
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
@@ -43,7 +43,7 @@ impl Vec3 {
         }
     }
 
-    pub fn unit_vector(&self) -> Self {
+    pub fn unit_vector(self) -> Self {
         let len = self.length();
         Vec3{
             x: self.x / len,
@@ -67,6 +67,15 @@ impl Vec3 {
             y: rng.gen_range(min, max),
             z: rng.gen_range(min, max),
         }
+    }
+
+    pub fn near_zero(self) -> bool {
+        let lim: f64 = 1e-8;
+        self.x.abs() < lim && self.y.abs() < lim && self.z.abs() < lim
+    }
+
+    pub fn reflect(self, n: Self) -> Self {
+        self - n * self.dot(n) * 2.
     }
 }
 
@@ -210,7 +219,7 @@ pub fn random_unit_vector() -> Vec3 {
     return random_in_unit_sphere().unit_vector();
 }
 
-pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
     let in_unit_sphere = random_in_unit_sphere();
     if in_unit_sphere.dot(normal) > 0. {
         return in_unit_sphere;
