@@ -227,3 +227,10 @@ pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
         return -in_unit_sphere;
     }
 }
+
+pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
+    let cos_theta = n.dot(-uv).min(1.);
+    let r_out_perp = (uv + n * cos_theta) * etai_over_etat;
+    let r_out_parallel = -n * (1. - r_out_perp.length_squared()).abs().sqrt();
+    return r_out_perp + r_out_parallel;
+}

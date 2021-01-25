@@ -24,12 +24,6 @@ fn ray_color<T: Hittable>(r: Ray, world: &Vec<T>, depth: i32) -> Color {
     }
 
     if let Some(rec) = hittable_list_hit(&world, r, 0.001, f64::INFINITY) {
-        // let target: Point3 = rec.p + vec3::random_in_hemisphere(rec.normal);
-        // return ray_color(
-        //     &Ray { orig: rec.p, dir: target - rec.p },
-        //     world,
-        //     depth-1)
-        // * 0.5;
         match rec.material.scatter(r, rec) {
             Some((attenuation, scattered)) => {
                 return attenuation * ray_color(scattered, world, depth-1);
@@ -59,11 +53,8 @@ fn main() {
     let mut world: Vec<Sphere> = vec!();
 
     let material_ground = Material::Lambertian { albedo: Color::new(0.8, 0.8, 0.0) };
-    let material_center = Material::Lambertian { albedo: Color::new(0.7, 0.3, 0.3) };
-    let material_left = Material::Metal {
-        albedo: Color::new(0.8, 0.8, 0.8),
-        fuzz: 0.3,
-    };
+    let material_center = Material::Dielectric { index_of_refraction: 1.5 };
+    let material_left = Material::Dielectric { index_of_refraction: 1.5 };
     let material_right = Material::Metal {
         albedo: Color::new(0.8, 0.6, 0.2),
         fuzz: 1.0,
