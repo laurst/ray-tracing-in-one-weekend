@@ -1,3 +1,5 @@
+use rand;
+
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::vec3::{ Color, random_unit_vector, random_in_unit_sphere, refract, reflect };
@@ -45,7 +47,9 @@ impl Material {
                 let sin_theta = (1. - cos_theta * cos_theta).sqrt();
 
                 let cannot_refract = refraction_ratio * sin_theta > 1.;
-                let direction = if cannot_refract {
+                let direction = if cannot_refract
+                    || reflectance(cos_theta, refraction_ratio) > rand::random::<f64>()
+                {
                     reflect(unit_direction, rec.normal)
                 } else {
                     refract(unit_direction, rec.normal, refraction_ratio)
@@ -57,4 +61,9 @@ impl Material {
             },
         }
     }
+}
+
+fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    let r0 = ((1.-ref_idx) / (1.+ref_idx)).powi(2);
+    r0 + (1.-r0) * (1.-cosine).powi(5)
 }
