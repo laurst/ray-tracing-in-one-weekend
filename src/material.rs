@@ -1,11 +1,14 @@
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
-use crate::vec3::{ Color, random_unit_vector };
+use crate::vec3::{ Color, random_unit_vector, random_in_unit_sphere };
 
 #[derive(Debug, Copy, Clone)]
 pub enum Material {
     Lambertian { albedo: Color },
-    Metal { albedo: Color },
+    Metal {
+        albedo: Color,
+        fuzz: f64,
+    },
 }
 
 
@@ -24,11 +27,12 @@ impl Material {
                 };
                 return Some((albedo, scattered));
             },
-            Material::Metal { albedo } => {
+            Material::Metal { albedo, fuzz } => {
                 let reflected = r_in.dir.unit_vector().reflect(rec.normal);
+                let fuzz = if fuzz < 1. { 1. } else { fuzz };
                 let scattered = Ray {
                     orig: rec.p,
-                    dir: reflected,
+                    dir: reflected + random_in_unit_sphere() * fuzz,
                 };
                 let attenuation = albedo;
                 return if scattered.dir.dot(rec.normal) > 0. {

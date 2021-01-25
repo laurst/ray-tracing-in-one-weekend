@@ -60,8 +60,14 @@ fn main() {
 
     let material_ground = Material::Lambertian { albedo: Color::new(0.8, 0.8, 0.0) };
     let material_center = Material::Lambertian { albedo: Color::new(0.7, 0.3, 0.3) };
-    let material_left = Material::Metal { albedo: Color::new(0.8, 0.8, 0.8) };
-    let material_right = Material::Metal { albedo: Color::new(0.8, 0.6, 0.2) };
+    let material_left = Material::Metal {
+        albedo: Color::new(0.8, 0.8, 0.8),
+        fuzz: 0.3,
+    };
+    let material_right = Material::Metal {
+        albedo: Color::new(0.8, 0.6, 0.2),
+        fuzz: 1.0,
+    };
 
     world.push(Sphere{
         center: Point3::new(0., -100.5, -1.),
