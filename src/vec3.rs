@@ -73,10 +73,6 @@ impl Vec3 {
         let lim: f64 = 1e-8;
         self.x.abs() < lim && self.y.abs() < lim && self.z.abs() < lim
     }
-
-    pub fn reflect(self, n: Self) -> Self {
-        self - n * self.dot(n) * 2.
-    }
 }
 
 impl ops::Neg for Vec3 {
@@ -233,4 +229,8 @@ pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
     let r_out_perp = (uv + n * cos_theta) * etai_over_etat;
     let r_out_parallel = -n * (1. - r_out_perp.length_squared()).abs().sqrt();
     return r_out_perp + r_out_parallel;
+}
+
+pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+    v - n * v.dot(n) * 2.
 }

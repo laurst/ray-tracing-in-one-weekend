@@ -53,11 +53,11 @@ fn main() {
     let mut world: Vec<Sphere> = vec!();
 
     let material_ground = Material::Lambertian { albedo: Color::new(0.8, 0.8, 0.0) };
-    let material_center = Material::Dielectric { index_of_refraction: 1.5 };
+    let material_center = Material::Lambertian { albedo: Color::new(0.1, 0.2, 0.5) };
     let material_left = Material::Dielectric { index_of_refraction: 1.5 };
     let material_right = Material::Metal {
         albedo: Color::new(0.8, 0.6, 0.2),
-        fuzz: 1.0,
+        fuzz: 0.0,
     };
 
     world.push(Sphere{
