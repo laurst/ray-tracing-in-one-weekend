@@ -76,6 +76,11 @@ fn main() {
         material: material_left,
     });
     world.push(Sphere{
+        center: Point3::new(-1., 0., -1.),
+        radius: -0.4,
+        material: material_left,
+    });
+    world.push(Sphere{
         center: Point3::new(1., 0., -1.),
         radius: 0.5,
         material: material_right,
