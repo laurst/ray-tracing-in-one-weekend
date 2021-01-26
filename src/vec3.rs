@@ -17,10 +17,17 @@ impl Vec3 {
         Vec3::new(0, 0, 0)
     }
 
-    pub fn new<T>(x: T, y: T, z: T) -> Vec3
-    where T: Into<f64>
+    pub fn new<T, U, V>(x: T, y: U, z: V) -> Vec3
+    where
+        T: Into<f64>,
+        U: Into<f64>,
+        V: Into<f64>,
     {
-        Vec3{ x: x.into(), y: y.into(), z: z.into() }
+        Vec3 {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+        }
     }
 
     pub fn length_squared(self) -> f64 {
@@ -36,7 +43,7 @@ impl Vec3 {
     }
 
     pub fn cross(self, other: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
             z: self.x * other.y - self.y * other.x,
@@ -45,7 +52,7 @@ impl Vec3 {
 
     pub fn unit_vector(self) -> Self {
         let len = self.length();
-        Vec3{
+        Vec3 {
             x: self.x / len,
             y: self.y / len,
             z: self.z / len,
@@ -53,7 +60,7 @@ impl Vec3 {
     }
 
     pub fn random() -> Vec3 {
-        Vec3{
+        Vec3 {
             x: random::<f64>(),
             y: random::<f64>(),
             z: random::<f64>(),
@@ -62,7 +69,7 @@ impl Vec3 {
 
     pub fn random_range(min: f64, max: f64) -> Vec3 {
         let mut rng = thread_rng();
-        Vec3{
+        Vec3 {
             x: rng.gen_range(min, max),
             y: rng.gen_range(min, max),
             z: rng.gen_range(min, max),
@@ -78,7 +85,7 @@ impl Vec3 {
 impl ops::Neg for Vec3 {
     type Output = Self;
     fn neg(self) -> Self {
-        Vec3{
+        Vec3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -89,7 +96,7 @@ impl ops::Neg for Vec3 {
 impl ops::Add for Vec3 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
@@ -100,7 +107,7 @@ impl ops::Add for Vec3 {
 impl ops::Sub for Vec3 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
@@ -111,7 +118,7 @@ impl ops::Sub for Vec3 {
 impl ops::Mul<f64> for Vec3 {
     type Output = Self;
     fn mul(self, t: f64) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x * t,
             y: self.y * t,
             z: self.z * t,
@@ -122,7 +129,7 @@ impl ops::Mul<f64> for Vec3 {
 impl ops::Mul for Vec3 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x * other.x,
             y: self.y * other.y,
             z: self.z * other.z,
@@ -133,7 +140,7 @@ impl ops::Mul for Vec3 {
 impl ops::Div<f64> for Vec3 {
     type Output = Self;
     fn div(self, t: f64) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x / t,
             y: self.y / t,
             z: self.z / t,
@@ -144,7 +151,7 @@ impl ops::Div<f64> for Vec3 {
 impl ops::Div for Vec3 {
     type Output = Self;
     fn div(self, other: Self) -> Self {
-        Vec3{
+        Vec3 {
             x: self.x / other.x,
             y: self.y / other.y,
             z: self.z / other.z,
@@ -192,21 +199,30 @@ pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
     g = (scale * g).sqrt();
     b = (scale * b).sqrt();
 
-    format!("{} {} {}",
-           (256. * clamp(r, 0., 0.999)) as u32,
-           (256. * clamp(g, 0., 0.999)) as u32,
-           (256. * clamp(b, 0., 0.999)) as u32
+    format!(
+        "{} {} {}",
+        (256. * clamp(r, 0., 0.999)) as u32,
+        (256. * clamp(g, 0., 0.999)) as u32,
+        (256. * clamp(b, 0., 0.999)) as u32
     )
 }
 
 fn clamp(x: f64, min: f64, max: f64) -> f64 {
-    if x < min { min } else if x > max { max } else { x }
+    if x < min {
+        min
+    } else if x > max {
+        max
+    } else {
+        x
+    }
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {
     loop {
         let p = Vec3::random_range(-1., 1.);
-        if p.length_squared() >= 1. { continue };
+        if p.length_squared() >= 1. {
+            continue;
+        };
         return p;
     }
 }

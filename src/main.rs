@@ -17,7 +17,7 @@ use hittable_list::hittable_list_hit;
 use material::Material;
 use ray::Ray;
 use sphere::Sphere;
-use vec3::{Point3, Color};
+use vec3::{Color, Point3};
 
 fn ray_color<T: Hittable>(r: Ray, world: &Vec<T>, depth: i32) -> Color {
     if depth <= 0 {
@@ -27,8 +27,8 @@ fn ray_color<T: Hittable>(r: Ray, world: &Vec<T>, depth: i32) -> Color {
     if let Some(rec) = hittable_list_hit(&world, r, 0.001, f64::INFINITY) {
         match rec.material.scatter(r, rec) {
             Some((attenuation, scattered)) => {
-                return attenuation * ray_color(scattered, world, depth-1);
-            },
+                return attenuation * ray_color(scattered, world, depth - 1);
+            }
             None => {
                 return Color::new(0, 0, 0);
             }
@@ -38,8 +38,7 @@ fn ray_color<T: Hittable>(r: Ray, world: &Vec<T>, depth: i32) -> Color {
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
 
-    return Color::new(1, 1, 1) * (1.0 - t)
-           + Color::new(0.5, 0.7, 1.0) * t;
+    return Color::new(1, 1, 1) * (1.0 - t) + Color::new(0.5, 0.7, 1) * t;
 }
 
 fn main() {
@@ -51,30 +50,34 @@ fn main() {
     let max_depth = 50;
 
     // WORLD
-    let r = (std::f64::consts::PI/4.).cos();
-    let mut world: Vec<Sphere> = vec!();
+    let r = (std::f64::consts::PI / 4.).cos();
+    let mut world: Vec<Sphere> = vec![];
 
-    let material_left = Material::Lambertian { albedo: Color::new(0., 0., 1.0) };
-    let material_right = Material::Lambertian { albedo: Color::new(1., 0., 0.) };
+    let material_left = Material::Lambertian {
+        albedo: Color::new(0, 0, 1),
+    };
+    let material_right = Material::Lambertian {
+        albedo: Color::new(1, 0, 0),
+    };
     // let material_left = Rc::new(Material::Dielectric { index_of_refraction: 1.5 });
     // let material_right = Rc::new(Material::Metal {
     //     albedo: Color::new(0.8, 0.6, 0.2),
     //     fuzz: 0.0,
     // });
 
-    world.push(Sphere{
-        center: Point3::new(-r, 0., -1.),
+    world.push(Sphere {
+        center: Point3::new(-r, 0, -1),
         radius: r,
         material: Rc::new(material_left),
     });
-    world.push(Sphere{
-        center: Point3::new(r, 0., -1.),
+    world.push(Sphere {
+        center: Point3::new(r, 0, -1),
         radius: r,
         material: Rc::new(material_right),
     });
 
     // CAMERA
-    let cam = Camera::new(90., 16./9.);
+    let cam = Camera::new(90., 16. / 9.);
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
