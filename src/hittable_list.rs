@@ -1,5 +1,4 @@
-// 6.15 would like us to use a struct with rc here. Let's try with a basic
-// vector first.
+use std::rc::Rc;
 
 use crate::hittable;
 use crate::material;
@@ -13,7 +12,9 @@ use vec3::Color;
 
 pub fn hittable_list_hit<T: Hittable>(objects: &Vec<T>, r: Ray, t_min: f64,
                      t_max: f64) -> Option<HitRecord> {
-    let mut temp_rec = HitRecord::new(Material::Lambertian { albedo: Color::zero() });
+    let mut temp_rec = HitRecord::new(Rc::new(
+        Material::Lambertian { albedo: Color::zero() }
+    ));
     let mut hit_anything = false;
     let mut closest_so_far = t_max;
 
