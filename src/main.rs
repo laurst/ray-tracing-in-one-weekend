@@ -51,44 +51,30 @@ fn main() {
     let max_depth = 50;
 
     // WORLD
+    let r = (std::f64::consts::PI/4.).cos();
     let mut world: Vec<Sphere> = vec!();
 
-    let material_ground = Rc::new(Material::Lambertian { albedo: Color::new(0.8, 0.8, 0.0) });
-    let material_center = Rc::new(Material::Lambertian { albedo: Color::new(0.1, 0.2, 0.5) });
-    let material_left = Rc::new(Material::Dielectric { index_of_refraction: 1.5 });
-    let material_right = Rc::new(Material::Metal {
-        albedo: Color::new(0.8, 0.6, 0.2),
-        fuzz: 0.0,
-    });
+    let material_left = Material::Lambertian { albedo: Color::new(0., 0., 1.0) };
+    let material_right = Material::Lambertian { albedo: Color::new(1., 0., 0.) };
+    // let material_left = Rc::new(Material::Dielectric { index_of_refraction: 1.5 });
+    // let material_right = Rc::new(Material::Metal {
+    //     albedo: Color::new(0.8, 0.6, 0.2),
+    //     fuzz: 0.0,
+    // });
 
     world.push(Sphere{
-        center: Point3::new(0., -100.5, -1.),
-        radius: 100.,
-        material: material_ground.clone(),
+        center: Point3::new(-r, 0., -1.),
+        radius: r,
+        material: Rc::new(material_left),
     });
     world.push(Sphere{
-        center: Point3::new(0., 0., -1.),
-        radius: 0.5,
-        material: material_center.clone(),
-    });
-    world.push(Sphere{
-        center: Point3::new(-1., 0., -1.),
-        radius: 0.5,
-        material: material_left.clone(),
-    });
-    world.push(Sphere{
-        center: Point3::new(-1., 0., -1.),
-        radius: -0.4,
-        material: material_left.clone(),
-    });
-    world.push(Sphere{
-        center: Point3::new(1., 0., -1.),
-        radius: 0.5,
-        material: material_right.clone(),
+        center: Point3::new(r, 0., -1.),
+        radius: r,
+        material: Rc::new(material_right),
     });
 
     // CAMERA
-    let cam = Camera::new();
+    let cam = Camera::new(90., 16./9.);
 
     println!("P3\n{} {}\n255", image_width, image_height);
 

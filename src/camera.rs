@@ -10,12 +10,14 @@ pub struct Camera {
     horizontal: Vec3,
     vertical: Vec3,
     lower_left_corner: Point3,
+    vfov: f64,
 }
 
 impl Camera {
-    pub fn new() -> Self {
-        let aspect_ratio: f64 = 16. / 9.;
-        let viewport_height: f64 = 2.;
+    pub fn new(vfov: f64, aspect_ratio: f64) -> Self {
+        let theta = vfov * std::f64::consts::PI / 180.;
+        let h = (theta/2.).tan();
+        let viewport_height: f64 = 2. * h;
         let viewport_width = aspect_ratio * viewport_height;
         let focal_length: f64 = 1.;
         let origin = Point3::zero();
@@ -35,6 +37,7 @@ impl Camera {
             horizontal,
             vertical,
             lower_left_corner,
+            vfov,
         }
     }
 
