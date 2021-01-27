@@ -1,6 +1,6 @@
 use std::ops;
 
-use rand::{thread_rng, Rng};
+use rand::{random, thread_rng, Rng};
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
@@ -56,6 +56,14 @@ impl Vec3 {
             x: self.x / len,
             y: self.y / len,
             z: self.z / len,
+        }
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3 {
+            x: random::<f64>(),
+            y: random::<f64>(),
+            z: random::<f64>(),
         }
     }
 
