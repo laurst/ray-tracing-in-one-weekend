@@ -1,6 +1,6 @@
 use std::ops;
 
-use rand::{random, thread_rng, Rng};
+use rand::{thread_rng, Rng};
 
 pub type Color = Vec3;
 pub type Point3 = Vec3;
@@ -56,14 +56,6 @@ impl Vec3 {
             x: self.x / len,
             y: self.y / len,
             z: self.z / len,
-        }
-    }
-
-    pub fn random() -> Vec3 {
-        Vec3 {
-            x: random::<f64>(),
-            y: random::<f64>(),
-            z: random::<f64>(),
         }
     }
 
@@ -231,12 +223,14 @@ pub fn random_unit_vector() -> Vec3 {
     return random_in_unit_sphere().unit_vector();
 }
 
-pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
-    let in_unit_sphere = random_in_unit_sphere();
-    if in_unit_sphere.dot(normal) > 0. {
-        return in_unit_sphere;
-    } else {
-        return -in_unit_sphere;
+pub fn random_in_unit_disk() -> Vec3 {
+    let mut rng = thread_rng();
+    loop {
+        let p = Vec3::new(rng.gen_range(-1., 1.), rng.gen_range(-1., 1.), 0);
+        if p.length_squared() >= 1. {
+            continue;
+        };
+        return p;
     }
 }
 
