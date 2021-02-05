@@ -1,3 +1,5 @@
+extern crate rayon;
+
 mod camera;
 mod hittable;
 mod hittable_list;
@@ -6,10 +8,12 @@ mod ray;
 mod sphere;
 mod vec3;
 
+use std::fs::File;
 use std::io::{stderr, Write};
-use std::rc::Rc;
+use std::sync::Arc;
 
 use rand::{random, thread_rng, Rng};
+use rayon::prelude::*;
 
 use camera::Camera;
 use hittable::Hittable;
@@ -50,7 +54,7 @@ fn random_scene() -> Vec<Sphere> {
     world.push(Sphere {
         center: Point3::new(0, -1000, 0),
         radius: 1000.,
-        material: Rc::new(material_ground),
+        material: Arc::new(material_ground),
     });
 
     let radius = 0.2;
@@ -59,7 +63,10 @@ fn random_scene() -> Vec<Sphere> {
         for b in -11..11 {
             let choose_mat = random::<f64>();
             let center = Point3::new(
-                a as f64 + 0.9 * random::<f64>(), 0.2, b as f64 + 0.9 * random::<f64>());
+                a as f64 + 0.9 * random::<f64>(),
+                0.2,
+                b as f64 + 0.9 * random::<f64>(),
+            );
 
             if (center - Point3::new(4, 0.2, 0)).length() > 0.9 {
                 if choose_mat < 0.8 {
@@ -68,7 +75,7 @@ fn random_scene() -> Vec<Sphere> {
                     world.push(Sphere {
                         center,
                         radius,
-                        material: Rc::new(sphere_material)
+                        material: Arc::new(sphere_material),
                     });
                 } else if choose_mat < 0.95 {
                     let albedo = Color::random_range(0.5, 1.);
@@ -77,16 +84,16 @@ fn random_scene() -> Vec<Sphere> {
                     world.push(Sphere {
                         center,
                         radius,
-                        material: Rc::new(sphere_material)
+                        material: Arc::new(sphere_material),
                     });
                 } else {
                     let sphere_material = Material::Dielectric {
-                        index_of_refraction: 1.5
+                        index_of_refraction: 1.5,
                     };
                     world.push(Sphere {
                         center,
                         radius,
-                        material: Rc::new(sphere_material)
+                        material: Arc::new(sphere_material),
                     });
                 }
             }
@@ -107,17 +114,17 @@ fn random_scene() -> Vec<Sphere> {
     world.push(Sphere {
         center: Point3::new(0, 1, 0),
         radius: 1.,
-        material: Rc::new(material1),
+        material: Arc::new(material1),
     });
     world.push(Sphere {
         center: Point3::new(-4, 1, 0),
         radius: 1.,
-        material: Rc::new(material2),
+        material: Arc::new(material2),
     });
     world.push(Sphere {
         center: Point3::new(4, 1, 0),
         radius: 1.,
-        material: Rc::new(material3),
+        material: Arc::new(material3),
     });
 
     world
@@ -126,9 +133,9 @@ fn random_scene() -> Vec<Sphere> {
 fn main() {
     // IMAGE
     let aspect_ratio = 3. / 2.;
-    let image_width = 1200;
+    let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 50;
     let max_depth = 50;
 
     // WORLD
@@ -150,22 +157,37 @@ fn main() {
         dist_to_focus,
     );
 
-    println!("P3\n{} {}\n255", image_width, image_height);
-
+    let mut pixels: Vec<(i32, i32)> = vec![];
     for j in (0..image_height).rev() {
-        eprint!("\rlines remaining : {:>3}", j);
-        let _ = stderr().flush();
         for i in 0..image_width {
+            pixels.push((i, j));
+        }
+    }
+
+    let lines = pixels
+        .par_iter()
+        .map(|(x, y)| {
             let mut pixel_color = Color::zero();
             for _ in 0..samples_per_pixel {
-                let u = (i as f64 + random::<f64>()) / (image_width - 1) as f64;
-                let v = (j as f64 + random::<f64>()) / (image_height - 1) as f64;
+                let _ = stderr().flush();
+
+                let u = (*x as f64 + random::<f64>()) / (image_width - 1) as f64;
+                let v = (*y as f64 + random::<f64>()) / (image_height - 1) as f64;
 
                 let r = cam.get_ray(u, v);
                 pixel_color += ray_color(r, &world, max_depth);
             }
-            println!("{}", vec3::write_color(&pixel_color, samples_per_pixel));
-        }
+            vec3::write_color(&pixel_color, samples_per_pixel)
+        })
+        .collect();
+
+    write_image(&lines, image_width, image_height);
+}
+
+fn write_image(lines: &Vec<String>, image_width: i32, image_height: i32) {
+    let mut file = File::create("toto.ppm").unwrap();
+    write!(&mut file, "P3\n{} {}\n255\n", image_width, image_height).unwrap();
+    for color in lines {
+        write!(&mut file, "{}\n", color).unwrap();
     }
-    eprintln!("\ndone");
 }

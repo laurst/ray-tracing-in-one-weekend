@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::material::Material;
 use crate::ray::Ray;
@@ -7,13 +7,13 @@ use crate::vec3::{Point3, Vec3};
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub material: Rc<Material>,
+    pub material: Arc<Material>,
     pub t: f64,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    pub fn new(material: Rc<Material>) -> HitRecord {
+    pub fn new(material: Arc<Material>) -> HitRecord {
         HitRecord {
             p: Point3::zero(),
             normal: Vec3::zero(),

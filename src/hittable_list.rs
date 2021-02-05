@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::hittable;
 use crate::material;
@@ -16,7 +16,7 @@ pub fn hittable_list_hit<T: Hittable>(
     t_min: f64,
     t_max: f64,
 ) -> Option<HitRecord> {
-    let mut temp_rec = HitRecord::new(Rc::new(Material::Lambertian {
+    let mut temp_rec = HitRecord::new(Arc::new(Material::Lambertian {
         albedo: Color::zero(),
     }));
     let mut hit_anything = false;
