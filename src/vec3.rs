@@ -189,7 +189,7 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
+pub fn to_rgb(pixel_color: &Color, samples_per_pixel: i32) -> (u32, u32, u32) {
     let mut r = pixel_color.x;
     let mut g = pixel_color.y;
     let mut b = pixel_color.z;
@@ -199,11 +199,10 @@ pub fn write_color(pixel_color: &Color, samples_per_pixel: i32) -> String {
     g = (scale * g).sqrt();
     b = (scale * b).sqrt();
 
-    format!(
-        "{} {} {}",
+    (
         (256. * clamp(r, 0., 0.999)) as u32,
         (256. * clamp(g, 0., 0.999)) as u32,
-        (256. * clamp(b, 0., 0.999)) as u32
+        (256. * clamp(b, 0., 0.999)) as u32,
     )
 }
 

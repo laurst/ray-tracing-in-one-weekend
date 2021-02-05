@@ -9,8 +9,9 @@ mod sphere;
 mod vec3;
 
 use std::fs::File;
-use std::io::{stderr, Write};
+use std::io::Write;
 use std::sync::Arc;
+use std::vec::Vec;
 
 use rand::{random, thread_rng, Rng};
 use rayon::prelude::*;
@@ -157,37 +158,35 @@ fn main() {
         dist_to_focus,
     );
 
-    let mut pixels: Vec<(i32, i32)> = vec![];
+    let mut pixels: Vec<(i32, i32)> = Vec::with_capacity((image_height * image_width) as usize);
     for j in (0..image_height).rev() {
         for i in 0..image_width {
             pixels.push((i, j));
         }
     }
 
-    let lines = pixels
+    let pixel_colors = pixels
         .par_iter()
         .map(|(x, y)| {
             let mut pixel_color = Color::zero();
             for _ in 0..samples_per_pixel {
-                let _ = stderr().flush();
-
                 let u = (*x as f64 + random::<f64>()) / (image_width - 1) as f64;
                 let v = (*y as f64 + random::<f64>()) / (image_height - 1) as f64;
 
                 let r = cam.get_ray(u, v);
                 pixel_color += ray_color(r, &world, max_depth);
             }
-            vec3::write_color(&pixel_color, samples_per_pixel)
+            vec3::to_rgb(&pixel_color, samples_per_pixel)
         })
         .collect();
 
-    write_image(&lines, image_width, image_height);
+    write_image(&pixel_colors, image_width, image_height);
 }
 
-fn write_image(lines: &Vec<String>, image_width: i32, image_height: i32) {
-    let mut file = File::create("toto.ppm").unwrap();
+fn write_image(pixel_colors: &Vec<(u32, u32, u32)>, image_width: i32, image_height: i32) {
+    let mut file = File::create("render.ppm").unwrap();
     write!(&mut file, "P3\n{} {}\n255\n", image_width, image_height).unwrap();
-    for color in lines {
-        write!(&mut file, "{}\n", color).unwrap();
-    }
+    pixel_colors
+        .iter()
+        .for_each(|(r, g, b)| write!(&mut file, "{} {} {}\n", r, g, b).unwrap());
 }
